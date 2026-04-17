@@ -27,7 +27,7 @@ function Invoke-ForEachParallelProxy {
         $ExcludeUserVariableName,
 
         [Parameter(Mandatory = $false)]
-        [int]$TimeoutSeconds = 60,
+        [int]$TimeoutSeconds,
 
         [Parameter(Mandatory = $false)]
         [Switch]$AsJob,
@@ -83,8 +83,19 @@ function Invoke-ForEachParallelProxy {
     $combinedScriptBlockString += $ScriptBlock.ToString() + "`n"
 
     $scriptBlockCombined = [scriptblock]::Create($combinedScriptBlockString)
+
+    $params = @{
+        Parallel = $scriptBlockCombined
+        ThrottleLimit = $ThrottleLimit
+        UseNewRunspace = $UseNewRunspace
+        Confirm = $Confirm
+    }
+
+    if ($AsJob -eq $true) {
+        $params.Add('AsJob', $AsJob)
+    }
         
-    $InputObject | ForEach-Object -Parallel $scriptBlockCombined -ThrottleLimit $ThrottleLimit -AsJob:$AsJob -UseNewRunspace:$UseNewRunspace -Confirm:$Confirm -TimeoutSeconds $TimeoutSeconds
+    $InputObject | ForEach-Object -AsJob:$AsJob -TimeoutSeconds $TimeoutSeconds
     
 }
 
