@@ -44,9 +44,11 @@ function Invoke-ForEachParallelProxy {
         $UserVariables = Get-Variable | where-object { $IncludeUserVariableName -contains $_.Name }
         Write-Verbose "Including variables $( ($IncludeUserVariableName | Sort-Object ) -join ", ")`n"
     } else {
-        Function _temp {[cmdletbinding(SupportsShouldProcess=$True)] param() }
-        $VariablesToExclude = @( (Get-Command _temp | Select-Object -ExpandProperty parameters).Keys + $PSBoundParameters.Keys + $StandardUserEnv.Variables )
+        # Function _temp {[cmdletbinding(SupportsShouldProcess=$True)] param() }
+        # $VariablesToExclude = @( (Get-Command _temp | Select-Object -ExpandProperty parameters).Keys + $PSBoundParameters.Keys + $StandardUserEnv.Variables )
         
+        $VariablesToExclude = Get-Default-Exclude-Variables
+
         # Get Excluded variable names from parameter and add to $VariablesToExclude
         $VariablesToExclude += $ExcludeUserVariableName
 
