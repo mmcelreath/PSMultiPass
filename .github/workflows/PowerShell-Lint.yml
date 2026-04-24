@@ -14,6 +14,9 @@ jobs:
         run: |
           $results = Invoke-ScriptAnalyzer -Path ./ -Recurse -Severity Error
           if ($results) {
-              $results | Format-Table
-              exit 1 # Fail the build if errors are found
+            Write-Host "PSScriptAnalyzer FAILED" -ForegroundColor Red
+            $results | Format-Table
+            exit 1 # Fail the build if errors are found
+          } else {
+            Write-Host "PSScriptAnalyzer PASSED" -ForegroundColor Green
           }
