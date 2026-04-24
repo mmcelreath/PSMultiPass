@@ -8,4 +8,4 @@ Get-ChildItem -Path $PSScriptRoot\Functions\Public\*.ps1 | ForEach-Object { . $_
 # Export only the functions using PowerShell standard verb-noun naming.
 # Be sure to list each exported functions in the FunctionsToExport field of the module manifest file.
 # This improves performance of command discovery in PowerShell.
-Export-ModuleMember -Function 'Invoke-ForEachParallelProxy'
+Export-ModuleMember -Function *-*

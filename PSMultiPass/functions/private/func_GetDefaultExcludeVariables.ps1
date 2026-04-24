@@ -1,4 +1,4 @@
-function Get-Default-Exclude-Variables {
+function func_GetDefaultExcludeVariables {
     Function _temp {
         [cmdletbinding(SupportsShouldProcess=$True)] param() 
     }
