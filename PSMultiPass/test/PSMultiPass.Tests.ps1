@@ -26,16 +26,31 @@ Describe 'ForEach Parallel Tests' {
     
     It 'Passes Invoke ForEach Parallel with User Variables' {
         $throttleLimit = 25
-        Invoke-ForEachParallelProxy -InputObject (1..100) -ScriptBlock {
-            "Testing..." | Out-Null
-        } -ImportUserVariables -ThrottleLimit $throttleLimit
+        $Global:testVariable = 'TestValue1'
+        $Global:Bag = [System.Collections.Concurrent.ConcurrentBag[psobject]]::new()
+        
+        Invoke-ForEachParallelProxy -InputObject (1..50) -ScriptBlock {
+            if ($testVariable -eq 'TestValue1') {
+                $Bag.Add('Succeeded')
+            }
+        } -ImportUserVariables -ThrottleLimit $throttleLimit 
+        
+        $results = $Bag.ToArray()
+
+        foreach ($result in $results) {
+            $result | Should -Be 'Succeeded'
+        }
+
     }
 
     It 'Passes Invoke ForEach Parallel with User Variables As a Job' {
-        $throttleLimit = 20
+        $throttleLimit = 25
+        $Global:testVariable = 'TestValue1'
 
-        $job = Invoke-ForEachParallelProxy -InputObject (1..20) -ScriptBlock {
-            Write-Output 'Succeeded'
+        $job = Invoke-ForEachParallelProxy -InputObject (1..50) -ScriptBlock {
+            if ($testVariable -eq 'TestValue1') {
+                Write-Output 'Succeeded'
+            }
         } -ImportUserVariables -ThrottleLimit $throttleLimit -AsJob
 
         Get-Job -Id $job.Id | Wait-Job | Out-Null

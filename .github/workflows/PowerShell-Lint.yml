@@ -1,0 +1,19 @@
+name: PowerShell Lint
+
+on: workflow_dispatch
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+      
+      - name: Run PSScriptAnalyzer
+        shell: pwsh
+        run: |
+          $results = Invoke-ScriptAnalyzer -Path ./ -Recurse -Severity Error
+          if ($results) {
+              $results | Format-Table
+              exit 1 # Fail the build if errors are found
+          }
