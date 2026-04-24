@@ -92,3 +92,12 @@ Invoke-ForEachParallelProxy -InputObject (1..10) -ScriptBlock {
 
 $results = $Bag.ToArray()
 $results
+
+
+$testVariable1 = 'TestValue1'
+$testVariable2 = 'TestValue2'
+
+Invoke-ForEachParallelProxy -InputObject (1..5) -ScriptBlock {
+    $currentItem = $_
+    Write-Host "Session: $currentItem, testVariable1 = $testVariable1, testVariable2 = $testVariable2"
+} -ImportUserVariables 
