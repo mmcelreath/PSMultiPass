@@ -10,6 +10,8 @@ Describe 'Module Manifest Tests' {
 
 Describe 'ForEach Parallel Tests' {
     BeforeAll {
+        Write-Host (pwd)
+        Write-Host (ls)
         Import-Module ./PSMultiPass/PSMultiPass.psm1 -Force -Verbose
     }
     
