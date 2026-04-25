@@ -1,5 +1,5 @@
 BeforeAll {
-    Import-Module 'C:\code\Github\PSMultiPass\PSMultiPass\PSMultiPass.psm1' -Force
+    Import-Module .\PSMultiPass\PSMultiPass.psm1 -Force -Verbose
 }
 
 Describe 'Module Manifest Tests' {
@@ -14,7 +14,7 @@ Describe 'Module Manifest Tests' {
 
 Describe 'ForEach Parallel Tests' {
     BeforeAll {
-        Import-Module 'C:\code\Github\PSMultiPass\PSMultiPass\PSMultiPass.psm1' -Force
+        Import-Module .\PSMultiPass\PSMultiPass.psm1 -Force -Verbose
     }
     
     It 'Passes Invoke ForEach Parallel' {
