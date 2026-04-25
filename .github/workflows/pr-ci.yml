@@ -44,4 +44,4 @@ jobs:
         env:
           PSGalleryApiKey: ${{ secrets.PSGALLERY_API_KEY }}
         run: |
-          Publish-Module -Path . -Repository PSGallery -NuGetApiKey $env:PSGalleryApiKey -WhatIf -Verbose
+          Publish-Module -Path .\PSMultiPass\ -Repository PSGallery -NuGetApiKey $env:PSGalleryApiKey -WhatIf -Verbose
