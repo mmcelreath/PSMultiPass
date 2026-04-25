@@ -43,7 +43,7 @@ jobs:
       - name: Run Pester Tests
         shell: pwsh
         run: |
-           Invoke-Pester -Output Detailed
+           Invoke-Pester -Path .\PSMultiPass\test\ -Output Detailed
 
       - name: Test publish to PowerShell Gallery
         shell: pwsh
