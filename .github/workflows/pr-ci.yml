@@ -1,4 +1,4 @@
-name: PowerShell Lint
+name: Pull Request CI
 
 on:
   push:
@@ -38,3 +38,10 @@ jobs:
           } else {
             Write-Host "PSScriptAnalyzer PASSED" -ForegroundColor Green
           }
+
+      - name: Test publish to PowerShell Gallery
+        shell: pwsh
+        env:
+          PSGalleryApiKey: ${{ secrets.PSGALLERY_API_KEY }}
+        run: |
+          Publish-Module -Path . -Repository PSGallery -NuGetApiKey $env:PSGalleryApiKey -WhatIf -Verbose

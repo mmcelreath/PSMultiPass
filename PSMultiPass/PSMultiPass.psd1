@@ -30,7 +30,7 @@ CompanyName = 'Unknown'
 Copyright = '(c) Matt McElreath. All rights reserved.'
 
 # Description of the functionality provided by this module
-# Description = ''
+Description = 'A PowerShell Module focusing on running parallel automation'
 
 # Minimum version of the PowerShell engine required by this module
 # PowerShellVersion = ''
