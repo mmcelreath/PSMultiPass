@@ -10,7 +10,7 @@ Describe 'Module Manifest Tests' {
 
 Describe 'ForEach Parallel Tests' {
     BeforeAll {
-        Import-Module .\PSMultiPass\PSMultiPass.psm1 -Force -Verbose
+        Import-Module .\PSMultiPass\ -Force -Verbose
     }
     
     It 'Passes Invoke ForEach Parallel' {
