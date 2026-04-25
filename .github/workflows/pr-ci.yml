@@ -18,6 +18,7 @@ jobs:
         shell: pwsh
         run: | 
           Install-Module -Name PSScriptAnalyzer -Force -Scope CurrentUser
+          Install-Module -Name Pester -Force -Scope CurrentUser
 
       - name: Test-ModuleManifest
         shell: pwsh
@@ -38,6 +39,11 @@ jobs:
           } else {
             Write-Host "PSScriptAnalyzer PASSED" -ForegroundColor Green
           }
+
+      - name: Run Pester Tests
+        shell: pwsh
+        run: |
+           Invoke-Pester -Output Detailed
 
       - name: Test publish to PowerShell Gallery
         shell: pwsh
