@@ -1,7 +1,3 @@
-BeforeAll {
-    Import-Module .\PSMultiPass\PSMultiPass.psm1 -Force -Verbose
-}
-
 Describe 'Module Manifest Tests' {
     It 'Passes Test-ModuleManifest' {
         $ModuleName = 'PSMultiPass'
