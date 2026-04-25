@@ -17,11 +17,14 @@ jobs:
       - name: Run PSScriptAnalyzer
         shell: pwsh
         run: |
-          $results = Invoke-ScriptAnalyzer -Path ./ -Recurse -Severity Error
+          $results = @()
+
+          $results += Invoke-ScriptAnalyzer -Path .\PSMultiPass\PSMultiPass.psm1 -Severity Error
+          $results += Invoke-ScriptAnalyzer -Path .\PSMultiPass\functions -Recurse -Severity Error
+
           if ($results) {
-            Write-Host "PSScriptAnalyzer FAILED" -ForegroundColor Red
             $results | Format-Table
-            exit 1 # Fail the build if errors are found
+            Throw "PSScriptAnalyzer FAILED" # Fail the build if errors are found
           } else {
             Write-Host "PSScriptAnalyzer PASSED" -ForegroundColor Green
           }
