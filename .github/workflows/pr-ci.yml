@@ -10,10 +10,20 @@ on:
 jobs:
   lint:
     runs-on: ubuntu-latest
-    steps:
+    steps:            
       - name: Checkout Code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       
+      - name: Install Modules
+        shell: pwsh
+        run: | 
+          Install-Module -Name PSScriptAnalyzer -Force -Scope CurrentUser
+
+      - name: Test-ModuleManifest
+        shell: pwsh
+        run: | 
+          Test-ModuleManifest -Path .\PSMultiPass\PSMultiPass.psd1
+          
       - name: Run PSScriptAnalyzer
         shell: pwsh
         run: |
