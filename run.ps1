@@ -76,7 +76,7 @@ Invoke-ForEachParallelProxy -InputObject (1..10) -ScriptBlock {
 $Bag = [System.Collections.Concurrent.ConcurrentBag[psobject]]::new()
 
 Invoke-ForEachParallelProxy -InputObject (1..10) -ScriptBlock { 
-    $Bag.Add("Test " + $_ + ' ' + $test3)
+    $Bag.Add("Test $_")
 } -ThrottleLimit $throttleLimit -ImportUserVariables
 
 $results = $Bag.ToArray()
