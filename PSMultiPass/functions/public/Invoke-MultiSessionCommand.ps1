@@ -37,7 +37,7 @@ function Invoke-MultiSessionCommand {
             Credential = $Credential
             ThrottleLimit = $SessionThrottleLimit
             ErrorVariable = 'sessionError'
-            # ErrorAction = 'SilentlyContinue'
+            ErrorAction = 'SilentlyContinue'
         }
 
         if ($SessionOption) { $sessionParameters.Add('SessionOption', $SessionOption)}
@@ -45,28 +45,37 @@ function Invoke-MultiSessionCommand {
 
         $sessions = New-PSSession @sessionParameters
 
-        # $sessions = New-PSSession -ComputerName $ComputerName -Credential $Credential -ErrorAction SilentlyContinue -ErrorVariable SessionError
+        $connectionErrorInfo = $sessionError.TargetObject
 
-        # Write-Output $sessionError
-
+        if ($sessionError) {
+            Write-Warning "One or more sessions were not created successfully. Please check the ConnectionErrorInfo property."
+        }
         
     }
 
     Process {
-        # $commandParameters = @{
-        #     Session = $sessions
-        #     ScriptBlock = $ScriptBlock
-        #     ThrottleLimit = $CommandThrottleLimit
-        # }
+        $commandParameters = @{
+            Session = $sessions
+            ScriptBlock = $ScriptBlock
+            ThrottleLimit = $CommandThrottleLimit
+            ErrorVariable = 'commandError'
+        }
         
-        # Invoke-Command @commandParameters
-        
-        # Write-Output $sessions
+        $commandOutput = Invoke-Command @commandParameters 
+    
     }
 
     End {
+
+        $output = [PSCustomObject]@{
+            CommandOutput = $commandOutput
+            ConnectionErrorInfo = $connectionErrorInfo
+        }
+
+        Write-Output $output
+
         # Clean up all sessions
         # TODO: Add parameter to prompt for cleaning up sessions? Default to True or False?
-        # Remove-PSSession -Session $sessions -ErrorAction $ErrorActionPreference
+        Remove-PSSession -Session $sessions -ErrorAction $ErrorActionPreference
     }
 }
