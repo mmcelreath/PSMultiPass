@@ -27,7 +27,10 @@ function Invoke-MultiSessionCommand {
         $SessionName,
 
         [int]
-        $SessionThrottleLimit = 32
+        $SessionThrottleLimit = 32,
+
+        [bool]
+        $CleanUpSessions = $true
     )
 
 
@@ -74,8 +77,11 @@ function Invoke-MultiSessionCommand {
 
         Write-Output $output
 
-        # Clean up all sessions
-        # TODO: Add parameter to prompt for cleaning up sessions? Default to True or False?
-        Remove-PSSession -Session $sessions -ErrorAction $ErrorActionPreference
+        
+        if ($CleanUpSessions) {
+            # Clean up all sessions
+            Remove-PSSession -Session $sessions -ErrorAction $ErrorActionPreference
+        }
+        
     }
 }
