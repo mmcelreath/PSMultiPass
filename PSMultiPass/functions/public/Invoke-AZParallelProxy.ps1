@@ -6,27 +6,35 @@ function Invoke-AZParallelProxy {
         [string[]]$Subscriptions,
 
         [Parameter(Mandatory = $true)]
-        [ScriptBlock]$ScriptBlock
+        [ScriptBlock]$ScriptBlock,
+
+        [Parameter(Mandatory = $false)]
+        [Int]$ThrottleLimit = 5
         
     )
     
     $combinedScriptBlockString = ''
 
-    $contextScriptBlockString = {
-        Write-Verbose "Processing subscription: $_"
+    $contextScriptBlock = {
+        Write-Verbose "Processing subscription: $_" -Verbose
         $context = Set-AzContext -Subscription $_ -Scope Process
+
     }
 
-    $combinedScriptBlockString += $contextScriptBlockString.ToString() + "`n"
+    $combinedScriptBlockString += $contextScriptBlock.ToString() + "`n"
 
-    $combinedScriptBlockString = $ScriptBlock.ToString()
+    $combinedScriptBlockString += $ScriptBlock.ToString()
 
     $scriptBlockCombined = [scriptblock]::Create($combinedScriptBlockString)
 
-    Invoke-ForEachParallelProxy -InputObject $Subscriptions -ScriptBlock $scriptBlockCombined -ImportUserVariables
+    $params = @{
+        InputObject = $Subscriptions
+        ScriptBlock = $scriptBlockCombined
+        ThrottleLimit = $ThrottleLimit
+        ImportUserVariables = $true
+    }
+    
+    Invoke-ForEachParallelProxy @params
     
 }
 
-Invoke-AZParallelProxy -Subscriptions $subs -ScriptBlock {
-    Get-AzResourceGroup -Name Subscription-* -AzContext $context
-}
