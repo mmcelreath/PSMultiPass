@@ -9,7 +9,7 @@ function Invoke-AZParallelProxy {
         [ScriptBlock]$ScriptBlock
         
     )
-
+    
     $combinedScriptBlockString = ''
 
     $contextScriptBlockString = {
@@ -25,4 +25,8 @@ function Invoke-AZParallelProxy {
 
     Invoke-ForEachParallelProxy -InputObject $Subscriptions -ScriptBlock $scriptBlockCombined -ImportUserVariables
     
+}
+
+Invoke-AZParallelProxy -Subscriptions $subs -ScriptBlock {
+    Get-AzResourceGroup -Name Subscription-* -AzContext $context
 }
