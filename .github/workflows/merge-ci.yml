@@ -43,7 +43,7 @@ jobs:
         run: |
            Invoke-Pester -Path .\PSMultiPass\test\ -Output Detailed
 
-      - name: Test publish to PowerShell Gallery
+      - name: Publish to PowerShell Gallery
         shell: pwsh
         env:
           PSGalleryApiKey: ${{ secrets.PSGALLERY_API_KEY }}
