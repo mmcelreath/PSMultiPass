@@ -3,6 +3,8 @@ name: Merge CI
 on:
   push:
     branches: [ "main" ]
+    paths:
+      - 'PSMultiPass/**'
   workflow_dispatch:
 
 jobs:
