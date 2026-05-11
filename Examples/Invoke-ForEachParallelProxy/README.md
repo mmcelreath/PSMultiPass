@@ -14,9 +14,7 @@ $Variable1 = 'Value-1'
 $Variable2 = 'Value-2'
 
 Invoke-ForEachParallelProxy -InputObject (1..5) -ScriptBlock {
-    
     Write-Host "Processing item $_ : Variable1=$Variable1, Variable2=$Variable2"
-
 } -ImportUserVariables 
 
 Processing item 2 : Variable1=Value-1, Variable2=Value-2
@@ -33,9 +31,7 @@ $Variable1 = 'Value-1'
 $Variable2 = 'Value-2'
 
 Invoke-ForEachParallelProxy -InputObject (1..5) -ScriptBlock {
-    
     Write-Host "Processing item $_ : Variable1=$Variable1, Variable2=$Variable2"
-
 } -ImportUserVariables -IncludeUserVariableName Variable2
 
 Processing item 1 : Variable1=, Variable2=Value-2
