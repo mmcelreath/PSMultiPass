@@ -55,15 +55,12 @@ $Variable2 = 'Value-2'
 $Bag = [System.Collections.Concurrent.ConcurrentBag[psobject]]::new()
 
 Invoke-ForEachParallelProxy -InputObject (1..5) -ScriptBlock {
-    
     $object = [PSCustomObject]@{
         Item = $_
         Variable1 = $Variable1
         Variable2 = $Variable2
     }
-    
     $Bag.Add($object)
-
 } -ImportUserVariables 
 
 $results = $Bag.ToArray()
