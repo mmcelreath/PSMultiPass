@@ -14,7 +14,9 @@ $Variable1 = 'Value-1'
 $Variable2 = 'Value-2'
 
 Invoke-ForEachParallelProxy -InputObject (1..5) -ScriptBlock {
+    
     Write-Host "Processing item $_ : Variable1=$Variable1, Variable2=$Variable2"
+
 } -ImportUserVariables 
 
 Processing item 2 : Variable1=Value-1, Variable2=Value-2
@@ -31,7 +33,9 @@ $Variable1 = 'Value-1'
 $Variable2 = 'Value-2'
 
 Invoke-ForEachParallelProxy -InputObject (1..5) -ScriptBlock {
+    
     Write-Host "Processing item $_ : Variable1=$Variable1, Variable2=$Variable2"
+
 } -ImportUserVariables -IncludeUserVariableName Variable2
 
 Processing item 1 : Variable1=, Variable2=Value-2
@@ -51,6 +55,7 @@ $Variable2 = 'Value-2'
 $Bag = [System.Collections.Concurrent.ConcurrentBag[psobject]]::new()
 
 Invoke-ForEachParallelProxy -InputObject (1..5) -ScriptBlock {
+    
     $object = [PSCustomObject]@{
         Item = $_
         Variable1 = $Variable1
@@ -58,6 +63,7 @@ Invoke-ForEachParallelProxy -InputObject (1..5) -ScriptBlock {
     }
     
     $Bag.Add($object)
+
 } -ImportUserVariables 
 
 $results = $Bag.ToArray()
