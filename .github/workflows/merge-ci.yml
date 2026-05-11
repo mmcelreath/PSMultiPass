@@ -1,53 +1,53 @@
-# name: Pull Request CI
+name: Pull Request CI
 
-# on:
-#   push:
-#     branches: [ "main" ]
-#   pull_request:
-#     branches: [ "main" ]
-#   workflow_dispatch:
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
 
-# jobs:
-#   lint:
-#     runs-on: windows-latest
-#     steps:            
-#       - name: Checkout Code
-#         uses: actions/checkout@v3
+jobs:
+  lint:
+    runs-on: windows-latest
+    steps:            
+      - name: Checkout Code
+        uses: actions/checkout@v3
       
-#       - name: Install Modules
-#         shell: pwsh
-#         run: | 
-#           Install-Module -Name PSScriptAnalyzer -Force -Scope CurrentUser
-#           Install-Module -Name Pester -Force -Scope CurrentUser
+      - name: Install Modules
+        shell: pwsh
+        run: | 
+          Install-Module -Name PSScriptAnalyzer -Scope CurrentUser
+          Install-Module -Name Pester -Scope CurrentUser
 
-#       - name: Test-ModuleManifest
-#         shell: pwsh
-#         run: | 
-#           Test-ModuleManifest -Path .\PSMultiPass\PSMultiPass.psd1
+      - name: Test-ModuleManifest
+        shell: pwsh
+        run: | 
+          Test-ModuleManifest -Path .\PSMultiPass\PSMultiPass.psd1
           
-#       - name: Run PSScriptAnalyzer
-#         shell: pwsh
-#         run: |
-#           $results = @()
+      - name: Run PSScriptAnalyzer
+        shell: pwsh
+        run: |
+          $results = @()
 
-#           $results += Invoke-ScriptAnalyzer -Path .\PSMultiPass\PSMultiPass.psm1 -Severity Error
-#           $results += Invoke-ScriptAnalyzer -Path .\PSMultiPass\functions -Recurse -Severity Error
+          $results += Invoke-ScriptAnalyzer -Path .\PSMultiPass\PSMultiPass.psm1 -Severity Error
+          $results += Invoke-ScriptAnalyzer -Path .\PSMultiPass\functions -Recurse -Severity Error
 
-#           if ($results) {
-#             $results | Format-Table
-#             Throw "PSScriptAnalyzer FAILED" # Fail the build if errors are found
-#           } else {
-#             Write-Host "PSScriptAnalyzer PASSED" -ForegroundColor Green
-#           }
+          if ($results) {
+            $results | Format-Table
+            Throw "PSScriptAnalyzer FAILED" # Fail the build if errors are found
+          } else {
+            Write-Host "PSScriptAnalyzer PASSED" -ForegroundColor Green
+          }
 
-#       - name: Run Pester Tests
-#         shell: pwsh
-#         run: |
-#            Invoke-Pester -Path .\PSMultiPass\test\ -Output Detailed
+      - name: Run Pester Tests
+        shell: pwsh
+        run: |
+           Invoke-Pester -Path .\PSMultiPass\test\ -Output Detailed
 
-#       - name: Test publish to PowerShell Gallery
-#         shell: pwsh
-#         env:
-#           PSGalleryApiKey: ${{ secrets.PSGALLERY_API_KEY }}
-#         run: |
-#           Publish-Module -Path .\PSMultiPass\ -Repository PSGallery -NuGetApiKey $env:PSGalleryApiKey -WhatIf -Verbose
+      - name: Test publish to PowerShell Gallery
+        shell: pwsh
+        env:
+          PSGalleryApiKey: ${{ secrets.PSGALLERY_API_KEY }}
+        run: |
+          Publish-Module -Path .\PSMultiPass\ -Repository PSGallery -NuGetApiKey $env:PSGalleryApiKey -Verbose
