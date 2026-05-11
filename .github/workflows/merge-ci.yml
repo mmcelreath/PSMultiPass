@@ -3,8 +3,8 @@ name: Merge CI
 on:
   push:
     branches: [ "main" ]
-    paths-ignore:
-      - '.github/**'
+    paths:
+      - 'PSMultiPass/**'
   workflow_dispatch:
 
 jobs:
