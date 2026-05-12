@@ -101,3 +101,12 @@ Invoke-ForEachParallelProxy -InputObject (1..5) -ScriptBlock {
     $currentItem = $_
     Write-Host "Session: $currentItem, testVariable1 = $testVariable1, testVariable2 = $testVariable2"
 } -ImportUserVariables 
+
+
+
+$scriptBlock = {                                                                                    
+    Add-WindowsFeature Web-Server -Verbose -WhatIf 
+}
+
+$test = Invoke-MultiSessionCommand -ComputerName core01,core02,core03 -ScriptBlock $scriptBlock -Credential $cred -Verbose
+
