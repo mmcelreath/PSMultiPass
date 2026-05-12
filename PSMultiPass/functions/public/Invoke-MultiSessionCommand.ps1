@@ -33,7 +33,6 @@ function Invoke-MultiSessionCommand {
         $CleanUpSessions = $true
     )
 
-
     Begin {
         $sessionParameters = @{
             ComputerName = $ComputerName 
@@ -46,6 +45,7 @@ function Invoke-MultiSessionCommand {
         if ($SessionOption) { $sessionParameters.Add('SessionOption', $SessionOption)}
         if ($SessionName) { $sessionParameters.Add('Name', $SessionName)}
 
+        Write-Verbose "Creating sessions for the following computer names: $($ComputerName -join ', ') with throttle limit of $SessionThrottleLimit..."
         $sessions = New-PSSession @sessionParameters
 
         $connectionErrorInfo = $sessionError.TargetObject
@@ -53,10 +53,21 @@ function Invoke-MultiSessionCommand {
         if ($sessionError) {
             Write-Warning "One or more sessions were not created successfully. Please check the ConnectionErrorInfo property."
         }
+
+        $sessionCount = $sessions.Count
+        Write-Verbose "Successfully created $sessionCount sessions."
         
     }
 
     Process {
+
+        if ($sessionCount -eq 0) {
+            Write-Warning "No sessions were created successfully. Skipping command invocation."
+            return
+        }
+
+        Write-Verbose "Invoking command on $sessionCount sessions with throttle limit of $CommandThrottleLimit..."
+        
         $commandParameters = @{
             Session = $sessions
             ScriptBlock = $ScriptBlock
@@ -76,10 +87,10 @@ function Invoke-MultiSessionCommand {
         }
 
         Write-Output $output
-
         
-        if ($CleanUpSessions) {
+        if ($CleanUpSessions -and $sessionCount -gt 0) {
             # Clean up all sessions
+            Write-Verbose "Cleaning up sessions..."            
             Remove-PSSession -Session $sessions -ErrorAction $ErrorActionPreference
         }
         
