@@ -23,9 +23,6 @@ function Invoke-MultiSessionCommand {
         [System.Management.Automation.Remoting.PSSessionOption]
         $SessionOption = $null,
 
-        [string[]]
-        $SessionName,
-
         [int]
         $SessionThrottleLimit = 32,
 
@@ -37,25 +34,18 @@ function Invoke-MultiSessionCommand {
         $sessionParameters = @{
             ComputerName = $ComputerName 
             Credential = $Credential
-            ThrottleLimit = $SessionThrottleLimit
+            SessionThrottleLimit = $SessionThrottleLimit
             ErrorVariable = 'sessionError'
             ErrorAction = 'SilentlyContinue'
         }
 
         if ($SessionOption) { $sessionParameters.Add('SessionOption', $SessionOption)}
-        if ($SessionName) { $sessionParameters.Add('Name', $SessionName)}
 
-        Write-Verbose "Creating sessions for the following computer names: $($ComputerName -join ', ') with throttle limit of $SessionThrottleLimit..."
-        $sessions = New-PSSession @sessionParameters
+        $sessionResults = Invoke-PSSessionProxy @sessionParameters
 
-        $connectionErrorInfo = $sessionError.TargetObject
-
-        if ($sessionError) {
-            Write-Warning "One or more sessions were not created successfully. Please check the ConnectionErrorInfo property."
-        }
-
+        $sessions = $sessionResults.Sessions
         $sessionCount = $sessions.Count
-        Write-Verbose "Successfully created $sessionCount sessions."
+        $connectionErrorInfo = $sessionResults.ConnectionErrorInfo
         
     }
 
