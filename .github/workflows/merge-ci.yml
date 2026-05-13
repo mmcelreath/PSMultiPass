@@ -1,7 +1,7 @@
-name: Pull Request CI
+name: Merge CI
 
 on:
-  pull_request:
+  push:
     branches: [ "main" ]
     paths:
       - 'PSMultiPass/**'
@@ -14,11 +14,11 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
       
-      # - name: Install Modules
-      #   shell: pwsh
-      #   run: | 
-      #     Install-Module -Name PSScriptAnalyzer -Force -Scope CurrentUser
-      #     Install-Module -Name Pester -Force -Scope CurrentUser
+    #   - name: Install Modules
+    #     shell: pwsh
+    #     run: | 
+    #       Install-Module -Name PSScriptAnalyzer -Force -Scope CurrentUser
+    #       Install-Module -Name Pester -Force -Scope CurrentUser
 
       - name: Test-ModuleManifest
         shell: pwsh
@@ -45,9 +45,9 @@ jobs:
         run: |
            Invoke-Pester -Path .\PSMultiPass\test\ -Output Detailed
 
-      - name: Test publish to PowerShell Gallery
+      - name: Publish to PowerShell Gallery
         shell: pwsh
         env:
           PSGalleryApiKey: ${{ secrets.PSGALLERY_API_KEY }}
         run: |
-          Publish-Module -Path .\PSMultiPass\ -Repository PSGallery -NuGetApiKey $env:PSGalleryApiKey -WhatIf -Verbose
+          Publish-Module -Path .\PSMultiPass\ -Repository PSGallery -NuGetApiKey $env:PSGalleryApiKey -Verbose

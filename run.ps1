@@ -3,11 +3,36 @@ Import-Module 'C:\code\Github\PSMultiPass\PSMultiPass\PSMultiPass.psm1' -Force
 
 $throttleLimit = 20
 
+$Variable1 = 'Value-1'
+$Variable2 = 'Value-2'
+
+Invoke-ForEachParallelProxy -InputObject (1..5) -ScriptBlock {
+    Write-Host "Processing item $_ : Variable1=$Variable1, Variable2=$Variable2"
+} -ImportUserVariables -IncludeUserVariableName Variable2
+
 Invoke-ForEachParallelProxy -InputObject (1..100) -ScriptBlock {
     $random = Get-Random -Minimum 1 -Maximum 5
     Write-Host "Processing item $_ in $random seconds - Test1=$test1, Test2=$test2, Test3=$test3"
     Start-Sleep -Seconds $random
 } -ImportUserVariables -ThrottleLimit $throttleLimit -Verbose -IncludeUserVariableName @('Test3')
+
+
+$Bag = [System.Collections.Concurrent.ConcurrentBag[psobject]]::new()
+
+Invoke-ForEachParallelProxy -InputObject (1..5) -ScriptBlock {
+    $object = [PSCustomObject]@{
+        Item = $_
+        Variable1 = $Variable1
+        Variable2 = $Variable2
+    }
+    
+    $Bag.Add($object)
+} -ImportUserVariables 
+
+$results = $Bag.ToArray()
+$results
+
+
 
 Invoke-ForEachParallelProxy -InputObject (1..100) -ScriptBlock {
     $random = Get-Random -Minimum 1 -Maximum 5

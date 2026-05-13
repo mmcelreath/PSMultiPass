@@ -95,13 +95,13 @@ PrivateData = @{
     PSData = @{
 
         # Tags applied to this module. These help with module discovery in online galleries.
-        # Tags = @()
+        Tags = @('powershell', 'parallel', 'automation', 'pssession', 'session', 'remoting', 'automation', 'azure')
 
         # A URL to the license for this module.
         # LicenseUri = ''
 
         # A URL to the main website for this project.
-        # ProjectUri = ''
+        ProjectUri = 'https://github.com/mmcelreath/PSMultiPass'
 
         # A URL to an icon representing this module.
         # IconUri = ''
