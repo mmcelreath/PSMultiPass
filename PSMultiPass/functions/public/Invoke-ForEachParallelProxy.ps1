@@ -1,3 +1,73 @@
+<#
+.SYNOPSIS
+    Executes a script block in parallel across multiple input objects with variable management.
+
+.DESCRIPTION
+    This function wraps ForEach-Object -Parallel to provide enhanced variable importing capabilities
+    and easier parallel execution management. It allows selective importing of user variables into
+    the parallel context while excluding system and cmdlet-binding variables.
+    
+    The input object is available as $_ within the script block, and parallel execution is
+    controlled via ThrottleLimit, TimeoutSeconds, and optional job execution.
+
+.PARAMETER InputObject
+    The object(s) to iterate through in parallel. Accepts arrays or pipeline input.
+
+.PARAMETER ScriptBlock
+    The script block to execute for each input object. The current object is available as $_.
+
+.PARAMETER ThrottleLimit
+    The maximum number of parallel threads to execute simultaneously.
+    Default value is 5. Increase for more parallelism on systems with more cores.
+
+.PARAMETER ImportUserVariables
+    Switch to enable importing current session variables into the parallel execution context.
+    By default, only necessary variables are imported to minimize context overhead.
+
+.PARAMETER IncludeUserVariableName
+    Specify an array of variable names to include when ImportUserVariables is enabled.
+    If specified, only these variables will be imported (whitelist mode).
+
+.PARAMETER ExcludeUserVariableName
+    Specify an array of variable names to exclude from import when ImportUserVariables is enabled.
+    Works in conjunction with default exclusions (blacklist mode).
+
+.PARAMETER TimeoutSeconds
+    The timeout in seconds for each parallel operation. Default 0 (no timeout).
+    Ignored if AsJob is specified.
+
+.PARAMETER AsJob
+    Switch to return the operation as a background job instead of waiting for completion.
+
+.PARAMETER UseNewRunspace
+    Switch to use a new runspace for each parallel iteration.
+
+.PARAMETER Confirm
+    Switch to prompt for confirmation before executing the parallel operation.
+
+.EXAMPLE
+    PS> 1..10 | Invoke-ForEachParallelProxy -ScriptBlock { $_ * 2 } -ThrottleLimit 5
+    
+    Multiplies numbers 1-10 by 2 in parallel with 5 concurrent threads.
+
+.EXAMPLE
+    PS> $data = @("file1.txt", "file2.txt", "file3.txt")
+    PS> $data | Invoke-ForEachParallelProxy -ScriptBlock {
+    PS>     Get-Content $_ | Measure-Object -Line
+    PS> } -ImportUserVariables
+    
+    Processes multiple files in parallel with access to current session variables.
+
+.NOTES
+    Variables are imported intelligently, excluding system variables and cmdlet-binding parameters
+    to reduce context overhead. Use IncludeUserVariableName or ExcludeUserVariableName to fine-tune
+    which variables are passed to parallel contexts.
+
+.LINK
+    ForEach-Object
+    Invoke-AZParallelProxy
+    func_GetDefaultExcludeVariables
+#>
 function Invoke-ForEachParallelProxy {
    [CmdletBinding()]
     param (
