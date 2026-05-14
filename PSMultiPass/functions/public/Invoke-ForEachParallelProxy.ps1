@@ -78,6 +78,7 @@ function Invoke-ForEachParallelProxy {
         [ScriptBlock]$ScriptBlock,
 
         [Parameter(Mandatory = $false)]
+        [ValidateRange(1, [int]::MaxValue)]
         [Int]$ThrottleLimit = 5,
 
         [Parameter(Mandatory = $false)]
@@ -92,6 +93,7 @@ function Invoke-ForEachParallelProxy {
         $ExcludeUserVariableName,
 
         [Parameter(Mandatory = $false)]
+        [ValidateRange(0, [int]::MaxValue)]
         [int]$TimeoutSeconds = 0,
 
         [Parameter(Mandatory = $false)]
@@ -108,35 +110,28 @@ function Invoke-ForEachParallelProxy {
 
     # Get User Variables to Import into Parallel scriptblock
     if ($ImportUserVariables) {
-        if ($IncludeUserVariableName) {
-            $UserVariables = Get-Variable | where-object { $IncludeUserVariableName -contains $_.Name }
-            Write-Verbose "Including variables $( ($IncludeUserVariableName | Sort-Object ) -join ", ")`n"
-        } else {
-
-            $VariablesToExclude =  func_GetDefaultExcludeVariables
-
-            # Get Excluded variable names from parameter and add to $VariablesToExclude
-            $VariablesToExclude += $ExcludeUserVariableName
-
-            Write-Verbose "Excluding variables $( ($VariablesToExclude | Sort-Object ) -join ", ")`n"
-
-            $UserVariables = @( Get-Variable | Where-Object { -not ($VariablesToExclude -contains $_.Name) } )
-            Write-Verbose "Found variables to import: $( ($UserVariables | Select-Object -expandproperty Name | Sort-Object ) -join ", " | Out-String).`n"
+        if ($ImportUserVariables) {
+            $allVariables = Get-Variable
+            
+            if ($IncludeUserVariableName) {
+                $UserVariables = $allVariables | Where-Object { $IncludeUserVariableName -contains $_.Name }
+                Write-Verbose "Including variables $( ($IncludeUserVariableName | Sort-Object) -join ", ")`n"
+            } else {
+                $VariablesToExclude = @(func_GetDefaultExcludeVariables) + @($ExcludeUserVariableName)
+                $UserVariables = $allVariables | Where-Object { $_.Name -notin $VariablesToExclude }
+                Write-Verbose "Excluding variables $( ($VariablesToExclude | Sort-Object) -join ", ")`n"
+            }
+            
+            Write-Verbose "Found variables to import: $( ($UserVariables.Name | Sort-Object) -join ", ")`n"
         }
     
         $ImportedVariablesScriptBlock = {
-            $vars = $Using:UserVariables
-            
-            $vars | ForEach-Object {
-                $Variable = $_
-
-                $varcheck = Get-Variable | where-object { $_.Name -eq $Variable.Name }
-                
-                if ($varcheck) {
-                    Write-Verbose "Variable $($Variable.Name) already exists   with value $($varcheck.Value) and will be skipped."
+            $Using:UserVariables | ForEach-Object {
+                if (Test-Path "Variable:$($_.Name)") {
+                    Write-Verbose "Variable $($_.Name) already exists and will be skipped."
                 } else {
-                    Write-Verbose "Importing variable $($Variable.Name) with value $($Variable.Value)"
-                    Set-Variable -Name $Variable.Name -Value $Variable.Value -Scope Global
+                    Write-Verbose "Importing variable $($_.Name) with value $($_.Value)"
+                    Set-Variable -Name $_.Name -Value $_.Value -Scope Global
                 }
             }
         }
