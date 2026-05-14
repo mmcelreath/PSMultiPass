@@ -38,14 +38,14 @@
     PS> $computers = @("RemoteHost1", "RemoteHost2")
     PS> $opts = New-PSSessionOption -SkipCertificateCheck
     PS> $result = Invoke-PSSessionProxy -ComputerName $computers -Credential $cred -SessionOption $opts
-    PS> $result.ConnectionErrorInfo
+    PS> $result.SessionErrorInfo
     
     Creates sessions with custom options and displays any connection errors.
 
 .OUTPUTS
     PSCustomObject with the following properties:
     - Sessions: Array of successfully created PSSession objects
-    - ConnectionErrorInfo: Array of connection failures with error details
+    - SessionErrorInfo: Array of connection failures with error details
 
 .NOTES
     - Connection errors are captured but do not stop the function from attempting other connections
@@ -92,10 +92,10 @@ function Invoke-PSSessionProxy {
         Write-Verbose "Creating sessions for the following computer names: $($ComputerName -join ', ') with throttle limit of $SessionThrottleLimit..."
         $sessions = New-PSSession @sessionParameters
 
-        $connectionErrorInfo = $sessionError.TargetObject
+        $sessionErrorInfo = $sessionError.TargetObject
 
         if ($sessionError) {
-            Write-Warning "One or more sessions were not created successfully. Please check the ConnectionErrorInfo property."
+            Write-Warning "One or more sessions were not created successfully. Please check the SessionErrorInfo property."
         }
 
         $sessionCount = $sessions.Count
@@ -107,7 +107,7 @@ function Invoke-PSSessionProxy {
 
         $output = [PSCustomObject]@{
             Sessions = $sessions
-            ConnectionErrorInfo = $connectionErrorInfo
+            SessionErrorInfo = $sessionErrorInfo
         }
 
         Write-Output $output

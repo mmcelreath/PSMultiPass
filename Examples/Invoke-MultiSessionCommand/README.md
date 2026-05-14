@@ -35,16 +35,15 @@ $computerNames = @("test01", "test02", "testxx")
 $result = Invoke-MultiSessionCommand -ComputerName $computerNames -Credential $credential -ScriptBlock $scriptBlock
 ```
 
-`$result` variable has 2 properties. `CommandOutput` and `ConnectionErrorInfo`
+`$result` variable has 3 properties: `CommandOutput`, `SessionErrorInfo`, and `CommandErrorInfo`
 
 ```powershell
-# Display CommandOutput and ConnectionErrorInfo
+# Display all properties
 $result 
 
-
-CommandOutput ConnectionErrorInfo
-------------- -------------------
-{BITS, BITS}  System.Management.Automation.RemoteRunspace
+CommandOutput SessionErrorInfo          CommandErrorInfo
+------------- -------------------       ----------------
+{BITS, BITS}  System.Management.Auto... 
 ```
 
 #### `CommandOutput` is an Array containing the outputs of your remote executions:
@@ -59,10 +58,10 @@ Stopped  BITS               Background Intelligent Transfer Servi… test01
 Stopped  BITS               Background Intelligent Transfer Servi… test02
 ```
 
-#### If there were any connection errors, they will be under the `ConnectionErrorInfo` property:
+#### If there were any connection errors, they will be under the `SessionErrorInfo` property:
 
 ```powershell
-$result.ConnectionErrorInfo
+$result.SessionErrorInfo
 
 Id Name            ComputerName    Type          State         Availability
  -- ----            ------------    ----          -----         ------------
@@ -72,7 +71,7 @@ Id Name            ComputerName    Type          State         Availability
 #### To get more connection error information, you can select all properties:
 
 ```powershell
-$result.ConnectionErrorInfo | select *
+$result.SessionErrorInfo | select *
 
 InitialSessionState    : 
 JobManager             : 
@@ -97,7 +96,7 @@ SessionStateProxy      : System.Management.Automation.RemoteSessionStateProxy
 #### If you want to get the failing computer name and see the connection info for each session, use the `ConnectionInfo` property:
 
 ```powershell
-$result.ConnectionErrorInfo.ConnectionInfo
+$result.SessionErrorInfo.ConnectionInfo
 
 ConnectionUri                     : http://testxx/wsman
 ComputerName                      : testxx
@@ -132,5 +131,31 @@ CancelTimeout                     : 60000
 OperationTimeout                  : 180000
 IdleTimeout                       : -1
 MaxIdleTimeout                    : 2147483647
+```
+
+#### If there were any command execution errors, they will be under the `CommandErrorInfo` property:
+
+```powershell
+$result.CommandErrorInfo
+
+Write-Error: This is an error message
+```
+
+#### To see command errors with detailed information:
+
+```powershell
+# Get detailed command error information
+$result.CommandErrorInfo | Select-Object *
+
+PSMessageDetails      : 
+OriginInfo            : test01
+Exception             : System.Management.Automation.RemoteException: This is an error message
+TargetObject          : 
+CategoryInfo          : NotSpecified: (:) [Write-Error], WriteErrorException
+FullyQualifiedErrorId : Microsoft.PowerShell.Commands.WriteErrorException,Microsoft.PowerShell.Commands.WriteErrorCommand
+ErrorDetails          : 
+InvocationInfo        : 
+ScriptStackTrace      : 
+PipelineIterationInfo : {}
 ```
 

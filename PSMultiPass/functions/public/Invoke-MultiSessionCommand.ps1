@@ -48,12 +48,20 @@
     PS> $computers = @("Server1", "Server2")
     PS> $result = Invoke-MultiSessionCommand -ComputerName $computers `
     PS>     -Credential $cred -ScriptBlock { whoami } -CleanUpSessions $false
-    PS> $result.ConnectionErrorInfo
+    PS> $result.SessionErrorInfo
+    PS> $result.CommandErrorInfo
     
-    Executes whoami command and keeps sessions open for reuse. Check ConnectionErrorInfo for connection failures.
+    Executes whoami command and keeps sessions open for reuse. Check SessionErrorInfo for connection failures and CommandErrorInfo for command execution errors.
+
+.OUTPUTS
+    PSCustomObject with the following properties:
+    - CommandOutput: Output from the executed script block on all remote computers
+    - SessionErrorInfo: Array of connection failures with error details
+    - CommandErrorInfo: Any errors encountered during command execution
 
 .NOTES
-    - Failed connections are tracked in the ConnectionErrorInfo property of the output
+    - Failed connections are tracked in the SessionErrorInfo property of the output
+    - Command execution errors are tracked in the CommandErrorInfo property of the output
     - Sessions are cleaned up by default unless CleanUpSessions is set to $false
     - Use SessionOption to customize connection behavior (e.g., SkipCertificateCheck)
     - CommandThrottleLimit controls parallelism during command execution, not session creation
@@ -106,7 +114,7 @@ function Invoke-MultiSessionCommand {
 
         $sessions = $sessionResults.Sessions
         $sessionCount = $sessions.Count
-        $connectionErrorInfo = $sessionResults.ConnectionErrorInfo
+        $sessionErrorInfo = $sessionResults.SessionErrorInfo
         
     }
 
@@ -134,7 +142,8 @@ function Invoke-MultiSessionCommand {
 
         $output = [PSCustomObject]@{
             CommandOutput = $commandOutput
-            ConnectionErrorInfo = $connectionErrorInfo
+            SessionErrorInfo = $sessionErrorInfo
+            CommandErrorInfo = $commandError
         }
 
         Write-Output $output
