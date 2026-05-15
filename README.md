@@ -5,7 +5,10 @@ This module started out as a way to run `ForEach-Object -Parallel` without havin
 
 The first command for this module is `Invoke-ForEachParallelProxy`, which can be used to import variables from the current scope into the parallel sessions created by `ForEach-Object -Parallel`. This idea came while reviewing the code for [Invoke-Parallel](https://github.com/RamblingCookieMonster/Invoke-Parallel) which was developed by Warren Frame ([RamblingCookieMonster](https://github.com/RamblingCookieMonster))
 
-## Usage
+# Usage
+
+## Invoke-ForeEachParallelProxy
+
 ```powershell
 # Install Module
 Install-Module PSMultiPass
@@ -29,7 +32,7 @@ Session: 5, testVariable1 = TestValue1, testVariable2 = TestValue2
 
 ```
 
-## Using with Thread-Safe variable
+### Using with Thread-Safe variable
 
 ```powershell
 # Install Module
@@ -58,4 +61,36 @@ Test 7
 Test 1
 Test 6
 Test 3
+```
+
+## Invoke-MultiSessionCommand
+
+```powershell
+# Credential for remote sessions
+$credential = Get-Credential
+
+# Define the script block to execute remotely
+$scriptBlock = {
+    Get-Service -Name BITS
+}
+
+$computerNames = @("test01", "test02", "testxx")
+
+$result = Invoke-MultiSessionCommand -ComputerName $computerNames -Credential $credential -ScriptBlock $scriptBlock
+
+# Display all properties
+$result 
+
+CommandOutput SessionErrorInfo          CommandErrorInfo
+------------- -------------------       ----------------
+{BITS, BITS}  System.Management.Auto... 
+
+# Access successful command output from each session:
+$result.CommandOutput 
+
+Status   Name               DisplayName                            PSComputerName
+------   ----               -----------                            --------------
+Stopped  BITS               Background Intelligent Transfer Servi… test01
+Stopped  BITS               Background Intelligent Transfer Servi… test02
+
 ```
