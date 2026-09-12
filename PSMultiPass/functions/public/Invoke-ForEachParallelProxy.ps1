@@ -105,6 +105,7 @@ function Invoke-ForEachParallelProxy {
     )
 
     $combinedScriptBlockString = ''
+    
 
     # Get User Variables to Import into Parallel scriptblock
     if ($ImportUserVariables) {
